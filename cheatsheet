@@ -1,0 +1,23 @@
+#GDB layout:
+tui new-layout luc {-horizontal src 4 asm 4} 4 status 0 regs 1 cmd 1
+
+#ASM symbol with SRC
+gcc -g 1_mul_base.c -S -fverbose-asm
+
+
+# Various basic CPU statistics, system wide, for 10 seconds:
+perf stat -e cycles,instructions,cache-references,cache-misses,bus-cycles -- ./a.out
+
+# Various CPU level 1 data cache statistics for the specified command:
+perf stat -e L1-dcache-loads,L1-dcache-load-misses,L1-dcache-stores -- ./a.out
+
+# Various CPU data TLB statistics for the specified command:
+perf stat -e dTLB-loads,dTLB-load-misses,dTLB-prefetch-misses -- ./a.out
+
+# Various CPU last level cache statistics for the specified command:
+perf stat -e LLC-loads,LLC-load-misses,LLC-stores,LLC-prefetches -- ./a.out
+
+# PMCs: counting cycles and frontend stalls via raw specification:
+perf stat -e cycles -e cpu/event=0x0e,umask=0x01,inv,cmask=0x01/ -- ./a.out
+
+perf stat -e cycles,instructions,cpu/event=0x0e,umask=0x01,inv,cmask=0x01/,cpu/event=0xb1,umask=0x01,inv,cmask=0x01/,dTLB-loads,dTLB-load-misses,LLC-loads,LLC-load-misses,branch-load,branch-load-misses -- ./a.out
